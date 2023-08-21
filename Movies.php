@@ -1,8 +1,7 @@
-
 <?php include "../inc/dbinfo.inc"; ?>
 <html>
 <body>
-<h1>Sample page</h1>
+<h1> Add a Movie</h1>
 <?php
 
   /* Connect to MySQL and select the database. */
@@ -17,10 +16,12 @@
 
   /* If input fields are populated, add a row to the MOVIES table. */
   $movie_name = htmlentities($_POST['NAME']);
-  $movie_principal_actor = htmlentities($_POST['PRINCIPAL ACTOR']);
+  $movie_actor = htmlentities($_POST['ACTOR']);
+  $movie_budget = htmlentities($_POST['BUDGET']);
+  $movie_rate = htmlentities($_POST['RATE']);
 
-  if (strlen($movie_name) || strlen($movie_principal_actor)) {
-    AddEmployee($connection, $movie_name, $movie_principal_actor);
+  if (strlen($movie_name) && strlen($movie_actor) && strlen((string)$movie_budget)) {
+    AddMovies($connection, $movie_name, $movie_actor, $movie_budget, $movie_rate);
   }
 ?>
 
@@ -29,17 +30,25 @@
   <table border="0">
     <tr>
       <td>NAME</td>
-      <td>PRINCIPAL ACTOR</td>
+      <td>ACTOR</td>
+      <td>BUDGET</td>
+      <td>RATE</td>
     </tr>
     <tr>
       <td>
         <input type="text" name="NAME" maxlength="45" size="30" />
       </td>
       <td>
-        <input type="text" name="PRINCIPAL ACTOR" maxlength="90" size="60" />
+        <input type="text" name="ACTOR" maxlength="90" size="60" />
       </td>
       <td>
-        <input type="date" name="PREMIERE">
+        <input type="number" name="BUDGET">
+      </td>
+      <td>
+        <input type="radio" name="RATE" value="Good" id="GOOD">
+          <label for="GOOD"> Good </label><br>
+        <input type="radio" name="RATE" value="Bad" id="BAD">
+          <label for="BAD"> Bad </label>
       </td>
       <td>
         <input type="submit" value="Add Data" />
@@ -53,18 +62,22 @@
   <tr>
     <td>ID</td>
     <td>NAME</td>
-    <td>ADDRESS</td>
+    <td>ACTOR</td>
+    <td>BUDGET</td>
+    <td>RATE</td>
   </tr>
 
 <?php
 
-$result = mysqli_query($connection, "SELECT * FROM EMPLOYEES");
+$result = mysqli_query($connection, "SELECT * FROM MOVIES");
 
 while($query_data = mysqli_fetch_row($result)) {
   echo "<tr>";
   echo "<td>",$query_data[0], "</td>",
        "<td>",$query_data[1], "</td>",
-       "<td>",$query_data[2], "</td>";
+       "<td>",$query_data[2], "</td>",
+       "<td>",$query_data[3], "</td>",
+       "<td>",$query_data[4], "</td>";
   echo "</tr>";
 }
 ?>
@@ -85,24 +98,28 @@ while($query_data = mysqli_fetch_row($result)) {
 
 <?php
 
-/* Add an employee to the table. */
-function AddEmployee($connection, $name, $address) {
+/* Add an movie to the table. */
+function AddMovies($connection, $name, $actor, $budget, $rate) {
    $n = mysqli_real_escape_string($connection, $name);
-   $a = mysqli_real_escape_string($connection, $address);
+   $a = mysqli_real_escape_string($connection, $actor);
+   $b = mysqli_real_escape_string($connection, $budget);
+   $r = ($rate === 'Good') ? 'Good' : 'Bad';
 
-   $query = "INSERT INTO EMPLOYEES (NAME, ADDRESS) VALUES ('$n', '$a');";
+   $query = "INSERT INTO MOVIES (NAME, ACTOR, BUDGET, RATE) VALUES ('$n', '$a', '$b', '$r');";
 
-   if(!mysqli_query($connection, $query)) echo("<p>Error adding employee data.</p>");
+   if(!mysqli_query($connection, $query)) echo("<p>Error adding movie data.</p>");
 }
 
 /* Check whether the table exists and, if not, create it. */
-function VerifyEmployeesTable($connection, $dbName) {
-  if(!TableExists("EMPLOYEES", $connection, $dbName))
+function VerifyMoviesTable($connection, $dbName) {
+  if(!TableExists("MOVIES", $connection, $dbName))
   {
-     $query = "CREATE TABLE EMPLOYEES (
+     $query = "CREATE TABLE MOVIES (
          ID int(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
          NAME VARCHAR(45),
-         ADDRESS VARCHAR(90)
+         ACTOR VARCHAR(90),
+         BUDGET int,
+         RATE ENUM('Good', 'Bad'),
        )";
 
      if(!mysqli_query($connection, $query)) echo("<p>Error creating table.</p>");
@@ -121,5 +138,4 @@ function TableExists($tableName, $connection, $dbName) {
 
   return false;
 }
-?>                        
-                
+?>

@@ -12,15 +12,15 @@
 
   $database = mysqli_select_db($connection, DB_DATABASE);
 
-  /* Ensure that the EMPLOYEES table exists. */
-  VerifyEmployeesTable($connection, DB_DATABASE);
+  /* Ensure that the MOVIES table exists. */
+  VerifyMoviesTable($connection, DB_DATABASE);
 
-  /* If input fields are populated, add a row to the EMPLOYEES table. */
-  $employee_name = htmlentities($_POST['NAME']);
-  $employee_address = htmlentities($_POST['ADDRESS']);
+  /* If input fields are populated, add a row to the MOVIES table. */
+  $movie_name = htmlentities($_POST['NAME']);
+  $movie_principal_actor = htmlentities($_POST['PRINCIPAL ACTOR']);
 
-  if (strlen($employee_name) || strlen($employee_address)) {
-    AddEmployee($connection, $employee_name, $employee_address);
+  if (strlen($movie_name) || strlen($movie_principal_actor)) {
+    AddEmployee($connection, $movie_name, $movie_principal_actor);
   }
 ?>
 
@@ -29,14 +29,17 @@
   <table border="0">
     <tr>
       <td>NAME</td>
-      <td>ADDRESS</td>
+      <td>PRINCIPAL ACTOR</td>
     </tr>
     <tr>
       <td>
         <input type="text" name="NAME" maxlength="45" size="30" />
       </td>
       <td>
-        <input type="text" name="ADDRESS" maxlength="90" size="60" />
+        <input type="text" name="PRINCIPAL ACTOR" maxlength="90" size="60" />
+      </td>
+      <td>
+        <input type="date" name="PREMIERE">
       </td>
       <td>
         <input type="submit" value="Add Data" />
